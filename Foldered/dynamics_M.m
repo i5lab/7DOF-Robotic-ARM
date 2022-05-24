@@ -1,3 +1,4 @@
+
 %% Dynamics
 [D,C,G] = dynamics_M();
 
@@ -30,9 +31,12 @@ function [D,C,G] = dynamics_M ()
     jw = sym(zeros(3,6));
     jv = sym(zeros(3,6));
    
-    T = cat(3,TDH1(d1,t(1)),TDH2(t(2)),TDH3(t(3),a2),TDH4(t(4),a3,d4),TDH5(t(5),d5),TDH6(d6,t(6)));
-    Tc = cat(3,TDHc1(),TDHc2(a2),TDHc3(a3, d4),TDHc4(d5),TDHc5(d6),TDHc6());
-    R = cat(3,RDH(TDH1(d1,t(1))),RDH(TDH2(t(2))),RDH(TDH3(t(3),a2)),RDH(TDH4(t(4),a3,d4)),RDH(TDH5(t(5),d5)),RDH(TDH6(d6,t(6))));
+    [T1, T2, T3, T4, T5, T6] = DH(t,d1, d4, d5, d6, a2, a3);
+    T = cat(3,T1, T2, T3, T4, T5, T6);
+    [R1, R2, R3, R4, R5, R6] = RDH(T1, T2, T3, T4, T5, T6, T);
+    R = cat(3,R1, R2, R3, R4, R5, R6);
+    [TC1, TC2, TC3, TC4, TC5, TC6] = DHC(d4, d5, d6, a2, a3);
+    Tc = cat(3,TC1, TC2, TC3, TC4, TC5, TC6);
     
     T_current = eye(4);
     R_current = eye(3);

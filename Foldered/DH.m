@@ -1,4 +1,5 @@
 function [T1, T2, T3, T4, T5, T6, T] = DH(t,d1, d4, d5, d6, a2, a3)
+    % MOdified DH parameters
     T1 = [cos(t(1)) -sin(t(1)) 0 0; sin(t(1)) cos(t(1)) 0 0; 0 0 1 d1; 0 0 0 1];
     T2 = [cos(t(2)) -sin(t(2)) 0 0; 0 0 -1 0 ;sin(t(2)) cos(t(2)) 0 0; 0 0 0 1];
     T3 = [cos(t(3)) -sin(t(3)) 0 -a2; sin(t(3)) cos(t(3)) 0 0; 0 0 1 0; 0 0 0 1];

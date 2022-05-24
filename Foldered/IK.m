@@ -21,27 +21,22 @@ a2 = 0.425;
 a3 = 0.3922;
 
 for i = -0.5:0.1:0.5
-    T1 = TDH1(d1 ,i*pi);
-    T2 = TDH2(t2);
-    T3 = TDH3(t3, a2);
-    T4 = TDH4(t4, a3, d4);
-    T5 = TDH5(t5, d5);
-    T6 = TDH6(d6, t6);
-    T = (T1 * T2 * T3 * T4 * T5 * T6);
+    t = [i*pi, 0, 0, 0, 0, 0];
+    [T1, T2, T3, T4, T5, T6, T] = DH(t,d1, d4, d5, d6, a2, a3);
     P = T(1:3,4);
     R = T(1:3,1:3);
     beta = asin(-R(3,1));
     gama = atan2(R(3,2),R(3,3));
     alpha = atan2(R(1,2),R(1,1));
     Q = inverse(P(1),P(2),P(3),alpha,beta,gama);
-    l(1) = Link([0, 0.089159,   0,          0,0]);
-    l(2) = Link([0, 0,          0,          pi/2,0]);
-    l(3) = Link([0, 0,          -0.425,     0,0]);
-    l(4) = Link([0, 0.10915,    -0.39225,   0,0]);
-    l(5) = Link([0, 0.09465,    0,          pi/2,0]);
-    l(6) = Link([0, 0.0823,     0,          -pi/2,0]);
+    l(1) = Link([0, 0.089159,   0,          0,0],'modified');
+    l(2) = Link([0, 0,          0,          pi/2,0],'modified');
+    l(3) = Link([0, 0,          -0.425,     0,0],'modified');
+    l(4) = Link([0, 0.10915,    -0.39225,   0,0],'modified');
+    l(5) = Link([0, 0.09465,    0,          pi/2,0],'modified');
+    l(6) = Link([0, 0.0823,     0,          -pi/2,0],'modified');
     ur = SerialLink(l);
-    ur.plot(Q)
+    ur.plot(Q,'noname')
     pause(0.01)
 end
 
@@ -82,33 +77,22 @@ function Q = inverse(x,y,z,alpha,beta,gama)
         q6 = atan2(a/sin(q5(1)),b/sin(q5(1)));
     end
 
-    %theta3
-    T5 = TDH5(q5(1) , d5);
-    T6 = TDH6(d6 , q6);
+    [T1, T2, T3, T4, T5, T6, T] = DH([q1(1),0,0,0,q5(1),q6],d1, d4, d5, d6, a2, a3);
     T64 = T5 * T6;
-    T10 = TDH1(d1, q1(1));
-    T41 = transpose(T10) * T60 * transpose(T64);
+    T41 = transpose(T1) * T60 * transpose(T64);
     P4xz = sqrt(T41(1,4)^2 + T41(3,4)^2);
+    
+    %theta3
     q3(1) = real(acos(((P4xz)^2 - a2^2 - a3^2)/(2*a2*a3)));
     q3(2) = -real(acos(((P4xz)^2 - a2^2 - a3^2)/(2*a2*a3)));
 
     %theta2
-    T5 = TDH5(q5(1) , d5);
-    T6 = TDH6(d6 , q6(1));
-    T64 = T5 * T6;
-    T10 = TDH1(d1, q1(1));
-    T41 = transpose(T10) * T60 * transpose(T64);
-    P4xz = sqrt(T41(1,4)^2 + T41(3,4)^2);
     phi1 = atan2(-T41(3,4), -T41(1,4)); 
     phi2 = asin(-a3*sin(q3(1))/abs(P4xz));
     q2 = phi1 - phi2;
 
+    [T1, T2, T3, T4, T5, T6, T] = DH([q1(1),q2,q3(1),0,q5(1),q6],d1, d4, d5, d6, a2, a3);
     %theta4
-    T5 = TDH5(q5(1) , d5);
-    T6 = TDH6(d6 , q6(1));
-    T1 = TDH1(d1, q1(1));
-    T2 = TDH2(q2(1));
-    T3 = TDH3(q3(1), a2);
     T64 = T5 * T6;
     T30 = T1*T2*T3;
     T43 = transpose(T30) * T60 * transpose(T64);
