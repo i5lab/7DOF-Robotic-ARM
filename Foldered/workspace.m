@@ -35,11 +35,11 @@ P = [transpose(x),transpose(y),transpose(z)];
 trisurf(boundary(P),P(:,1),P(:,2),P(:,3));
 
 %% Validation (WorkSpace)
-l(1) = Link([0,0.089159,0,pi/2,0]);
-l(2) = Link([0,0,-0.425,0,0]);
-l(3) = Link([0,0,-0.39225,0,0]);
-l(4) = Link([0,0.10915,0,pi/2,0]);
-l(5) = Link([0,0.09465,0,-pi/2,0]);
-l(6) = Link([0,0.0823,0,0,0]);
+l(1) = Link([0, 0.089159,   0,          0,0],'modified');
+l(2) = Link([0, 0,          0,          pi/2,0],'modified');
+l(3) = Link([0, 0,          -0.425,     0,0],'modified');
+l(4) = Link([0, 0.10915,    -0.39225,   0,0],'modified');
+l(5) = Link([0, 0.09465,    0,          pi/2,0],'modified');
+l(6) = Link([0, 0.0823,     0,          -pi/2,0],'modified');
 ur = SerialLink(l);
 ur.plot([0,0,0,0,0,0],'jvec','noname')

@@ -371,8 +371,12 @@ function [v,w] = velocity_omega(n)
     v = [0;0;0];
     t = sym('t',[1 6]);
     q = sym('q', [1 6]);
-    syms d1 d4 d5 d6 a2 a3
-    T = cat(3,TDH1(d1,t(1)),TDH2(t(2)),TDH3(t(3),a2),TDH4(t(4),a3,d4),TDH5(t(5),d5),TDH6(d6,t(6)));
+    d1 = 0.089159;
+    d4 = 0.10915;
+    d5 = 0.09465;
+    d6 = 0.0823	;
+    a2 = -0.425;
+    a3 = -0.3922;    T = cat(3,TDH1(d1,t(1)),TDH2(t(2)),TDH3(t(3),a2),TDH4(t(4),a3,d4),TDH5(t(5),d5),TDH6(d6,t(6)));
     R = cat(3,RDH(TDH1(d1,t(1))),RDH(TDH2(t(2))),RDH(TDH3(t(3),a2)),RDH(TDH4(t(4),a3,d4)),RDH(TDH5(t(5),d5)),RDH(TDH6(d6,t(6))));
     
     for i = 1:n

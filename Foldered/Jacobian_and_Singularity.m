@@ -4,45 +4,81 @@ t = sym('t', [1 6]);
 [jv,jw] = Jacobain_General(t);
 jv = simplify(jv);
 jw = simplify(jw);
-J = vpa([jv;jw]);
-disp(J);
+J = vpa([jv;jw])
 %% Jacobian_Velocity_propagation
 disp("Velocity propagation Jacobian : ")
 [v,w] = velocity_omega();
 [jv,jw] = Jacobain_Velocity_propagation(v,w);
 jv = simplify(jv);
 jw = simplify(jw);
-J = vpa([jv;jw]);
-disp(J);
+J = vpa([jv;jw])
+%% Validation (Jacobian)
+t =zeros(1,6);
+[jv,jw] = Jacobain_General(t);
+jv = jv;
+jw = jw;
+J = vpa([jv;jw])
+
+l(1) = Link([0, 0.089159,   0,          0,0],'modified');
+l(2) = Link([0, 0,          0,          pi/2,0],'modified');
+l(3) = Link([0, 0,          -0.425,     0,0],'modified');
+l(4) = Link([0, 0.10915,    -0.39225,   0,0],'modified');
+l(5) = Link([0, 0.09465,    0,          pi/2,0],'modified');
+l(6) = Link([0, 0.0823,     0,          -pi/2,0],'modified');
+ur = SerialLink(l);
+peter_corke = ur.jacob0([0,0,0,0,0,0])
+
 %% singularities
 clear singular
 b = 1;
-l(1) = Link([0,0.089159,0,pi/2,0]);
-l(2) = Link([0,0,-0.425,0,0]);
-l(3) = Link([0,0,-0.39225,0,0]);
-l(4) = Link([0,0.10915,0,pi/2,0]);
-l(5) = Link([0,0.09465,0,-pi/2,0]);
-l(6) = Link([0,0.0823,0,0,0]);
+l(1) = Link([0, 0.089159,   0,          0,0]);
+l(2) = Link([0, 0,          0,          pi/2,0]);
+l(3) = Link([0, 0,          -0.425,     0,0]);
+l(4) = Link([0, 0.10915,    -0.39225,   0,0]);
+l(5) = Link([0, 0.09465,    0,          pi/2,0]);
+l(6) = Link([0, 0.0823,     0,          -pi/2,0]);
 ur = SerialLink(l);
+
+% for i = 0:0.2:1.9
+%     for j = 0:0.2:1.9
+%         for k = 0:0.2:1.9
+%             [jv,jw] = Jacobain_General([i*pi,j*pi,k*pi,pi,1.5*pi,0]);
+%             J = [jv;jw];
+%             J11 = J(1:3,1:3);
+%             detereminant = det(J11);
+%             %detereminant = det([jv;jw]);
+%             if (detereminant < 5e-20)
+%                  singular(b,1:6) = [i*pi,j*pi,k*pi,pi,1.5*pi,0];
+%                  figure(1);
+%                  ur.plot([i*pi,j*pi,k*pi,pi,1.5*pi,0]);
+%                  pause(0.0001);
+%                  b = b+1;
+%             end 
+%         end
+%     end 
+% end
+
+
 for i = 0:0.2:1.9
     for j = 0:0.2:1.9
         for k = 0:0.2:1.9
-            [jv,jw] = Jacobain_General(6,i*pi,j*pi,k*pi,pi,1.5*pi,0);
-            J = [jv;jw];
-            J11 = J(1:3,1:3);
-            detereminant = det(J11);
-            %detereminant = det([jv;jw]);
-            if (detereminant < 5e-20)
-                 singular(b,1:6) = [i*pi,j*pi,k*pi,pi,1.5*pi,0];
-                 %figure(1);
-                 %ur.plot([i*pi,j*pi,k*pi,pi,1.5*pi,0]);
-                 %pause(0.0001);
-                 b = b+1;
-            end 
-        end
-    end 
-end
-disp(singular);
+            for l = 0:0.2:1.9
+                for m = 0:0.2:1.9
+                    for n = 0:0.2:1.9
+                        [jv,jw] = Jacobain_General([i*pi,j*pi,k*pi,l*pi,m*pi,n*pi]);
+                        J = [jv;jw];
+                        if (det(J) < 5e-20)
+                             figure(1);
+                             ur.plot([i*pi,j*pi,k*pi,l*pi,m*pi,n*pi]);
+                             pause(0.0001);
+                        end
+                    end
+                end
+            end
+        end 
+    end
+end 
+
 
 %%
 function [jv,jw] = Jacobain_General(t) 
@@ -87,17 +123,16 @@ function [v,w] = velocity_omega()
     a2 = -0.425;
     a3 = -0.3922;
 %     syms d1 d4 d5 d6 a2 a3
-    [T1, T2, T3, T4, T5, T6] = DH(t,d1, d4, d5, d6, a2, a3);
-    T = cat(3,T1, T2, T3, T4, T5, T6);
+    [T1, T2, T3, T4, T5, T6, T] = DH(t,d1, d4, d5, d6, a2, a3);
+    T_CAT = cat(3,T1, T2, T3, T4, T5, T6);
     [R1, R2, R3, R4, R5, R6, RT] = RDH(T1, T2, T3, T4, T5, T6, T);
-    R = cat(3,R1, R2, R3, R4, R5, R6);
-    
+    R_CAT = cat(3,R1, R2, R3, R4, R5, R6);
+
     for i = 1:6
-        P = T(:,:,i);
-        v = transpose(R(:,:,i)) * (v + cross(w,P(1:3,4)));
-        w = transpose(R(:,:,i)) * w + [0;0;q(i)];
+        P = T_CAT(:,:,i);
+        v = transpose(R_CAT(:,:,i)) * (v + cross(w,P(1:3,4)));
+        w = transpose(R_CAT(:,:,i)) * w + [0;0;q(i)];
     end
-    
     w = RT*w;
     v = RT*v;
 end
