@@ -2,7 +2,7 @@
 %% Dynamics
 [D,C,G] = dynamics_M();
 
-function [D,C,G] = dynamics_M ()
+function [D,C,G] = dynamics_M()
     t = sym('t', [1 6]);
     m = sym('m', [1 6]);
     d1 = 0.089159;
@@ -50,15 +50,15 @@ function [D,C,G] = dynamics_M ()
         for n = 1:i
             jv(1:3,n) = cross(R_stack(:,3,n),(Tc_stack(1:3,4,i)-T(1:3,4,n)));
         end
-        rc(i) = -jv(1,1);
+        rc(i) = Tc_current(3,4);  % z coefficient of cn claculated in base frame 
         D = D + (mass(i)*transpose(jv)*jv) + (transpose(jw)*R_stack(:,:,i)*I(:,:,i)*transpose(R_stack(:,:,i))*jw);
     end    
     
     for k = 1:6
+        P = P + 9.8*rc(k)*mass(k)
         for i = 1:6
             for j = i:6
                 C(i,j,k) = 0.5*(diff(D(k,j),t(i)) + diff(D(k,i),t(j)) - diff(D(i,j),t(k)));
-                P = P + (9.8*rc(i)*mass(i));
             end 
         end 
     end
