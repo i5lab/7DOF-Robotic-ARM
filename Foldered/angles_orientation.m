@@ -3,7 +3,7 @@
 disp("Eigenvector and theta : ")
 theta = acos((T(1,1) + T(2,2) + T(3,3) - 1)/2);
 theta = simplify(theta)
-k = 1/sin(theta) * [T(3,2)-T(2,3);T(1,3)-T(3,1);T(2,1)-T(1,2)];
+k = 1/(2*sin(theta)) * [T(3,2)-T(2,3);T(1,3)-T(3,1);T(2,1)-T(1,2)];
 k = simplify(k)
 
 %Fixed angles
